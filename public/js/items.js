@@ -1,21 +1,20 @@
 document.addEventListener('DOMContentLoaded', loadData);
 
+let dataTableInstance = null;
+
 async function loadData() {
     try {
         const res = await fetch('/api/items');
         const data = await res.json();
         let rows = '';
-        
-        data.forEach(item => {
+
+        data.forEach((item, index) => {
             rows += `
                 <tr>
-                    <td>${item.id_item}</td>
-                    <td>${item.name_item}</td>
+                    <td>${index + 1}</td> <td>${item.name_item}</td>
                     <td>${item.type_item || '-'}</td>
                     <td>${item.brand_item || '-'}</td>
-                    <td>${item.info_item || '-'}</td>
-                    <td><strong>${item.total_item}</strong></td>
-                    <td>
+                    <td><strong>${item.total_item}</strong></td> <td>${item.info_item || '-'}</td> <td>
                         <button class="btn btn-sm btn-warning" 
                             onclick="bukaEdit(${item.id_item}, '${item.name_item}', '${item.type_item}', '${item.brand_item}', '${item.info_item}')">
                             Edit
@@ -25,7 +24,20 @@ async function loadData() {
                 </tr>
             `;
         });
-        document.getElementById('tabelBarang').innerHTML = rows;
+
+        const tabelBody = document.getElementById('tabelBarang');
+        tabelBody.innerHTML = rows;
+
+        const tabelElement = document.getElementById('datatablesSimple');
+        
+        if (dataTableInstance) {
+            dataTableInstance.destroy();
+        }
+        
+        if (tabelElement) {
+            dataTableInstance = new simpleDatatables.DataTable(tabelElement);
+        }
+
     } catch (error) {
         console.error('Gagal memuat data:', error);
     }
